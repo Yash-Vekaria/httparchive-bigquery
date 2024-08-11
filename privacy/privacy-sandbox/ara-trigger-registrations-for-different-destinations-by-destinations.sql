@@ -1,0 +1,6 @@
+-- Analysis of Attribution Reporting API (ARA) Triggers registered for different destinations by destination domains:
+-- 1. No. of third-parties that register trigger for the given destination
+-- 2. Min. epsilon
+-- 3. Avg. epsilon
+-- 4. Max. epsilon
+-- [Higher the epsilon, the more the privacy protection]
