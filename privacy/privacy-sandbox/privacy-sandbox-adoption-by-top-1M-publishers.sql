@@ -1,4 +1,4 @@
--- Usage of different Privacy Sandbox (PS) features by Top 10K publishers
+-- Usage of different Privacy Sandbox (PS) features by Top 1M publishers
 -- Example: publisher.com: {“runAdAuction”: 10} [“runAdAuction” is a PS feature column and 10 is #TPs calling “runAdAuction” on publisher.com]
 
 -- Extracting third-parties observed using PS APIs on a publisher
@@ -73,7 +73,7 @@ WITH privacy_sandbox_features AS (
       date = '2024-06-01' AND
       client = 'desktop' AND
       is_root_page = TRUE AND
-      rank <= 10000
+      rank <= 1000000
 ),
 
 grouped_features AS (
