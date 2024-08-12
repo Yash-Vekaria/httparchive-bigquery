@@ -58,7 +58,6 @@ LANGUAGE js AS """
 
 WITH privacy_sandbox_features AS (
   SELECT
-    rank AS publisher_rank,
     NET.REG_DOMAIN(page) AS publisher,
     third_party_domain,
     CASE
@@ -81,15 +80,13 @@ WITH privacy_sandbox_features AS (
 
 grouped_features AS (
   SELECT
-    publisher_rank,
     publisher,
     feature,
     COUNT(DISTINCT third_party_domain) AS third_party_count
   FROM privacy_sandbox_features
-  GROUP BY publisher_rank, publisher, feature
+  GROUP BY publisher, feature
 )
 SELECT
-  publisher_rank, 
   publisher,
   SUM(IF(feature = 'runAdAuction', third_party_count, 0)) AS runAdAuction,
   SUM(IF(feature = 'navigator.userAgentData.getHighEntropyValues', third_party_count, 0)) AS navigator_userAgentData_getHighEntropyValues,
@@ -175,5 +172,4 @@ SELECT
   SUM(IF(feature = 'Sec-CH-Viewport-Height', third_party_count, 0)) AS Sec_CH_Viewport_Height,
   SUM(IF(feature = 'Sec-CH-Viewport-Width', third_party_count, 0)) AS Sec_CH_Viewport_Width
 FROM grouped_features
-GROUP BY publisher_rank, publisher
-ORDER BY publisher_rank;
+GROUP BY publisher;
