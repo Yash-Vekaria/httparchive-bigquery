@@ -1,0 +1,8 @@
+-- Captures cookie-syncing inclusion chains to measure prevalence of cookie syncing under the purview of privacy
+-- Approach is followed from https://umariqbal.com/papers/khaleesi-usenix2022.pdf
+-- Chains are identified based on the following details:
+-- 1. Query parameters and domain from request URL
+-- 2. Request/Response headers (Cookie and Set-Cookie headers)
+-- 3. Response status codes
+-- 4. Query parameters and domain from Response/Redirect URLs
+-- Order of the output
