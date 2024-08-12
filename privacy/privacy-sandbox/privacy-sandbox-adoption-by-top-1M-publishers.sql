@@ -1,4 +1,5 @@
 -- Usage of different Privacy Sandbox (PS) features by Top 1M publishers
+-- Output size is in the order of 500K rows and 84 columns
 -- Example: publisher.com: {“runAdAuction”: 10} [“runAdAuction” is a PS feature column and 10 is #TPs calling “runAdAuction” on publisher.com]
 
 -- Extracting third-parties observed using PS APIs on a publisher
