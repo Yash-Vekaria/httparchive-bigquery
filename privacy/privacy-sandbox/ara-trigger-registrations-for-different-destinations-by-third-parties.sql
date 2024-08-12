@@ -3,8 +3,8 @@
 -- 2. Min. epsilon
 -- 3. Avg. epsilon
 -- 4. Max. epsilon
--- [Higher the epsilon, the more the privacy protection] [Epsilon is always undefined, so last 3 columns can be removed]
--- Output comprises 17 rows and 4 columns.
+-- [Higher the epsilon, the more the privacy protection] [Epsilon is always undefined, so last 3 columns are removed for this year]
+-- Output comprises 17 rows and 1 column.
 
 -- Extracting third-parties observed using ARA API on a publisher
 CREATE TEMP FUNCTION jsonObjectKeys(input STRING)
@@ -69,11 +69,12 @@ WITH ara_features AS (
 )
 SELECT
   third_party_domain,
-  COUNT(DISTINCT destination) AS destination_count,
-  MIN(CASE WHEN epsilon IS NOT NULL THEN epsilon END) AS min_epsilon,
-  AVG(CASE WHEN epsilon IS NOT NULL THEN epsilon END) AS avg_epsilon,
-  MAX(CASE WHEN epsilon IS NOT NULL THEN epsilon END) AS max_epsilon
+  COUNT(DISTINCT destination) AS destination_count
+  -- MIN(CASE WHEN epsilon IS NOT NULL THEN epsilon END) AS min_epsilon,
+  -- AVG(CASE WHEN epsilon IS NOT NULL THEN epsilon END) AS avg_epsilon,
+  -- MAX(CASE WHEN epsilon IS NOT NULL THEN epsilon END) AS max_epsilon
 FROM ara_features
+WHERE third_party_domain is NOT NULL
 GROUP BY third_party_domain
-HAVING destination_count > 0;
-
+HAVING destination_count > 0
+ORDER BY destination_count DESC;
