@@ -1,2 +1,0 @@
--- Usage of different Privacy Sandbox (PS) feature by each Third Party (TP)
--- Example: thirdparty.com: {“runAdAuction”: 20} [20 represents number of publishers on which the current TP calls “runAdAuction”]
