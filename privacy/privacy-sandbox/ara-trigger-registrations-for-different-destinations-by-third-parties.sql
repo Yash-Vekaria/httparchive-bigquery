@@ -4,6 +4,7 @@
 -- 3. Avg. epsilon
 -- 4. Max. epsilon
 -- [Higher the epsilon, the more the privacy protection] [Epsilon is always undefined, so last 3 columns can be removed]
+-- Output comprises 17 rows and 4 columns.
 
 -- Extracting third-parties observed using ARA API on a publisher
 CREATE TEMP FUNCTION jsonObjectKeys(input STRING)
