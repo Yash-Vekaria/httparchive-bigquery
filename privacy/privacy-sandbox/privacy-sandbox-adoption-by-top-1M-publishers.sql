@@ -27,6 +27,11 @@ LANGUAGE js AS """
   }
 
   const result = [];
+  const replacements = {
+    'Ch': 'CH', 'Ua': 'UA', 'Wow64': 'WoW64', 'Dpr': 'DPR', 'Rtt': 'RTT', 'Ect': 'ECT', 'Etc': 'ETC', '-Architecture': '-Arch', '-Arc': '-Arch', '-Archh': '-Arch', 
+    '-Factors': '-Factor', '-ETC': '-ECT', '-Modal': '-Model', '-UA-UA': '-UA', '-UAm': '-UA', 'UAmodel': 'UA-Model', 'UAplatform': 'UA-Platform', 'Secch-UA': 'Sec-CH-UA', 
+    'CH-Width': 'CH-Viewport-Width', '-UAodel': '-UA-Model', '-Platformua-Platform': '-Platform', '-Platformuser-Agent': '-Platform', '-Version"': '-Version'
+  };
   values.forEach(value => {
     if (value.startsWith('accept-ch|')) {
       const parts = splitByDelimiters(value.replace('accept-ch|', ''));
@@ -37,12 +42,9 @@ LANGUAGE js AS """
           let formattedPart = part.split('-').map(segment => 
             segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase()
           ).join('-');
-          formattedPart = formattedPart.replace('Ch', 'CH');
-          formattedPart = formattedPart.replace('Ua', 'UA');
-          formattedPart = formattedPart.replace('Wow64', 'WoW64');
-          formattedPart = formattedPart.replace('Dpr', 'DPR');
-          formattedPart = formattedPart.replace('Rtt', 'RTT');
-          formattedPart = formattedPart.replace('Ect', 'ECT');
+          for (const [key, value] of Object.entries(replacements)) {
+            formattedPart = formattedPart.replace(new RegExp(key, 'g'), value);
+          }
           result.push(formattedPart);
         }
       });
@@ -56,6 +58,7 @@ LANGUAGE js AS """
 
 WITH privacy_sandbox_features AS (
   SELECT
+    rank AS publisher_rank,
     NET.REG_DOMAIN(page) AS publisher,
     third_party_domain,
     CASE
@@ -78,13 +81,15 @@ WITH privacy_sandbox_features AS (
 
 grouped_features AS (
   SELECT
+    publisher_rank,
     publisher,
     feature,
     COUNT(DISTINCT third_party_domain) AS third_party_count
   FROM privacy_sandbox_features
-  GROUP BY publisher, feature
+  GROUP BY publisher_rank, publisher, feature
 )
 SELECT
+  publisher_rank, 
   publisher,
   SUM(IF(feature = 'runAdAuction', third_party_count, 0)) AS runAdAuction,
   SUM(IF(feature = 'navigator.userAgentData.getHighEntropyValues', third_party_count, 0)) AS navigator_userAgentData_getHighEntropyValues,
@@ -133,12 +138,16 @@ SELECT
   SUM(IF(feature = 'document.browsingTopics-true', third_party_count, 0)) AS document_browsingTopics_true,
   SUM(IF(feature = 'sec-browsing-topics-false', third_party_count, 0)) AS sec_browsing_topics_false,
   SUM(IF(feature = 'sec-browsing-topics-true', third_party_count, 0)) AS sec_browsing_topics_true,
-  SUM(IF(feature = 'navigator.userAgentData.getHighEntropyValues', third_party_count, 0)) AS navigator_userAgentData_getHighEntropyValues,
-  SUM(IF(feature = 'Sec-CH-DPR', third_party_count, 0)) AS Sec_CH_DPR,
+  SUM(IF(feature = 'navigator.userAgentData.getHighEntropyValues', third_party_count, 0)) AS navigator_UAData_getHighEntropyValues,
+  SUM(IF(feature = 'Sec-CH-Bitness', third_party_count, 0)) AS Sec_CH_Bitness,
   SUM(IF(feature = 'Sec-CH-Device-Memory', third_party_count, 0)) AS Sec_CH_Device_Memory,
   SUM(IF(feature = 'Sec-CH-Downlink', third_party_count, 0)) AS Sec_CH_Downlink,
+  SUM(IF(feature = 'Sec-CH-DPR', third_party_count, 0)) AS Sec_CH_DPR,
   SUM(IF(feature = 'Sec-CH-ECT', third_party_count, 0)) AS Sec_CH_ECT,
   SUM(IF(feature = 'Sec-CH-Forced-Colors', third_party_count, 0)) AS Sec_CH_Forced_Colors,
+  SUM(IF(feature = 'Sec-CH-Height', third_party_count, 0)) AS Sec_CH_Height,
+  SUM(IF(feature = 'Sec-CH-Lang', third_party_count, 0)) AS Sec_CH_Lang,
+  SUM(IF(feature = 'Sec-CH-Partitioned-Cookies', third_party_count, 0)) AS Sec_CH_Partitioned_Cookies,
   SUM(IF(feature = 'Sec-CH-Prefers-Color-Scheme', third_party_count, 0)) AS Sec_CH_Prefers_Color_Scheme,
   SUM(IF(feature = 'Sec-CH-Prefers-Contrast', third_party_count, 0)) AS Sec_CH_Prefers_Contrast,
   SUM(IF(feature = 'Sec-CH-Prefers-Reduced-Data', third_party_count, 0)) AS Sec_CH_Prefers_Reduced_Data,
@@ -147,11 +156,11 @@ SELECT
   SUM(IF(feature = 'Sec-CH-RTT', third_party_count, 0)) AS Sec_CH_RTT,
   SUM(IF(feature = 'Sec-CH-Save-Data', third_party_count, 0)) AS Sec_CH_Save_Data,
   SUM(IF(feature = 'Sec-CH-UA', third_party_count, 0)) AS Sec_CH_UA,
+  SUM(IF(feature = 'Sec-CH-UA-*', third_party_count, 0)) AS Sec_CH_UA_star,
   SUM(IF(feature = 'Sec-CH-UA-Arch', third_party_count, 0)) AS Sec_CH_UA_Arch,
-  SUM(IF(feature = 'Sec-CH-UA-Architecture', third_party_count, 0)) AS Sec_CH_UA_Architecture,
   SUM(IF(feature = 'Sec-CH-UA-Bitness', third_party_count, 0)) AS Sec_CH_UA_Bitness,
+  SUM(IF(feature = 'Sec-CH-UA-Browser', third_party_count, 0)) AS Sec_CH_UA_Browser,
   SUM(IF(feature = 'Sec-CH-UA-Form-Factor', third_party_count, 0)) AS Sec_CH_UA_Form_Factor,
-  SUM(IF(feature = 'Sec-CH-UA-Form-Factors', third_party_count, 0)) AS Sec_CH_UA_Form_Factors,
   SUM(IF(feature = 'Sec-CH-UA-Full', third_party_count, 0)) AS Sec_CH_UA_Full,
   SUM(IF(feature = 'Sec-CH-UA-Full-Version', third_party_count, 0)) AS Sec_CH_UA_Full_Version,
   SUM(IF(feature = 'Sec-CH-UA-Full-Version-List', third_party_count, 0)) AS Sec_CH_UA_Full_Version_List,
@@ -160,12 +169,11 @@ SELECT
   SUM(IF(feature = 'Sec-CH-UA-Platform', third_party_count, 0)) AS Sec_CH_UA_Platform,
   SUM(IF(feature = 'Sec-CH-UA-Platform-Version', third_party_count, 0)) AS Sec_CH_UA_Platform_Version,
   SUM(IF(feature = 'Sec-CH-UA-Platform-WoW64', third_party_count, 0)) AS Sec_CH_UA_Platform_WoW64,
-  SUM(IF(feature = 'Sec-CH-UA-Platformuser-Agent', third_party_count, 0)) AS Sec_CH_UA_Platformuser_Agent,
+  SUM(IF(feature = 'Sec-CH-UA-Reduced', third_party_count, 0)) AS Sec_CH_UA_Reduced,
   SUM(IF(feature = 'Sec-CH-UA-UA', third_party_count, 0)) AS Sec_CH_UA_UA,
   SUM(IF(feature = 'Sec-CH-UA-WoW64', third_party_count, 0)) AS Sec_CH_UA_WoW64,
   SUM(IF(feature = 'Sec-CH-Viewport-Height', third_party_count, 0)) AS Sec_CH_Viewport_Height,
-  SUM(IF(feature = 'Sec-CH-Viewport-Width', third_party_count, 0)) AS Sec_CH_Viewport_Width,
-  SUM(IF(feature = 'Sec-CH-Width', third_party_count, 0)) AS Sec_CH_Width
+  SUM(IF(feature = 'Sec-CH-Viewport-Width', third_party_count, 0)) AS Sec_CH_Viewport_Width
 FROM grouped_features
-GROUP BY publisher
-ORDER BY publisher;
+GROUP BY publisher_rank, publisher
+ORDER BY publisher_rank;
