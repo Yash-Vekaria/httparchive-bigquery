@@ -35,7 +35,7 @@ CREATE TEMP FUNCTION SHA1Hash(token STRING) AS (
   LOWER(TO_HEX(SHA1(SAFE_CAST(token AS BYTES))))
 );
 
-WITH TokenizedRequests AS (
+CREATE TEMP TABLE TokenizedRequests AS (
   SELECT
     pages.rank,
     NET.REG_DOMAIN(requests.page) AS publisher,
@@ -98,8 +98,9 @@ WITH TokenizedRequests AS (
     pages.client = 'desktop' AND
     requests.is_root_page = true AND
     pages.rank < 1000
-),
-TokenGroups AS (
+);
+
+WITH TokenGroups AS (
   SELECT
     t1.publisher,
     t1.third_party_domain,
