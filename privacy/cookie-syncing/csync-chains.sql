@@ -96,7 +96,8 @@ WITH TokenizedRequests AS (
     pages.date = '2024-06-01' AND
     requests.client = 'desktop' AND
     pages.client = 'desktop' AND
-    pages.rank < 1000000
+    requests.is_root_page = true AND
+    pages.rank < 1000
 ),
 TokenGroups AS (
   SELECT
