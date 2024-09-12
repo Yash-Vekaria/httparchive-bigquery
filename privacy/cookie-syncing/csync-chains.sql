@@ -97,7 +97,7 @@ CREATE TEMP TABLE TokenizedRequests AS (
     requests.client = 'desktop' AND
     pages.client = 'desktop' AND
     requests.is_root_page = true AND
-    pages.rank < 1000
+    pages.rank <= 1000
 );
 
 WITH TokenGroups AS (
