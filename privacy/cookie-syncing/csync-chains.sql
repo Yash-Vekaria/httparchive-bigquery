@@ -88,8 +88,10 @@ CREATE TEMP TABLE TokenizedRequests AS (
         )
       )
     ) AS tokens
-  FROM `httparchive.all.requests` AS requests
-  JOIN `httparchive.all.pages` AS pages
+  -- FROM `httparchive.all.requests` AS requests
+  -- JOIN `httparchive.all.pages` AS pages
+  FROM `httparchive.sample_data.requests_1k` AS requests
+  JOIN `httparchive.sample_data.pages_1k` AS pages
   ON NET.REG_DOMAIN(requests.page) = NET.REG_DOMAIN(pages.page)
   WHERE 
     requests.date = '2024-06-01' AND
